@@ -47,7 +47,7 @@ public class sqlDB {
             con = DriverManager.getConnection("jdbc:sqlite:" + sqlPath);
             Statement stmt = null;
             stmt = con.createStatement();
-                String sql = "INSERT INTO user (cardId,name,account,guest,admin,register) VALUES (" + cardId + ", '" + name + "', '" + acc + "', '" + guest + "', '" + admin + "','" + ts + "')";
+            String sql = "INSERT INTO user (cardId,name,account,guest,admin,register) VALUES (" + cardId + ", '" + name + "', '" + acc + "', '" + guest + "', '" + admin + "','" + ts + "')";
 
             stmt.executeUpdate(sql);
 
@@ -149,6 +149,94 @@ public class sqlDB {
         }
 
         return id;
+    }
+
+    public boolean isAdmin(int id) {
+        Connection con = null;
+
+        try {
+            Class.forName("org.sqlite.JDBC");
+            con = DriverManager.getConnection("jdbc:sqlite:" + sqlPath);
+            Statement stmt = null;
+            stmt = con.createStatement();
+            String sql = "SELECT admin FROM user WHERE id = '" + id + "';";
+
+            ResultSet rs = stmt.executeQuery(sql);
+
+            while (rs.next()) {
+                return Boolean.valueOf(rs.getString("admin"));
+            }
+            stmt.close();
+            con.close();
+        } catch (ClassNotFoundException | SQLException e) {
+            error = e.toString();
+           
+            try {
+                con.close();
+            } catch (SQLException ex) {
+
+            }
+        }
+
+        return false;
+    }
+
+    public boolean isGuest(int id) {
+        Connection con = null;
+
+        try {
+            Class.forName("org.sqlite.JDBC");
+            con = DriverManager.getConnection("jdbc:sqlite:" + sqlPath);
+            Statement stmt = null;
+            stmt = con.createStatement();
+            String sql = "SELECT guest FROM user WHERE id = '" + id + "';";
+
+            ResultSet rs = stmt.executeQuery(sql);
+
+            while (rs.next()) {
+               return Boolean.valueOf(rs.getString("guest"));
+            }
+            stmt.close();
+            con.close();
+        } catch (ClassNotFoundException | SQLException e) {
+            error = e.toString();
+            try {
+                con.close();
+            } catch (SQLException ex) {
+
+            }
+        }
+
+        return false;
+    }
+
+    public int getCardID(int id) {
+        Connection con = null;
+
+        try {
+            Class.forName("org.sqlite.JDBC");
+            con = DriverManager.getConnection("jdbc:sqlite:" + sqlPath);
+            Statement stmt = null;
+            stmt = con.createStatement();
+            String sql = "SELECT cardId FROM user WHERE id = '" + id + "';";
+
+            ResultSet rs = stmt.executeQuery(sql);
+
+            while (rs.next()) {
+                return rs.getInt("cardId");
+            }
+            stmt.close();
+            con.close();
+        } catch (ClassNotFoundException | SQLException e) {
+            error = e.toString();
+            try {
+                con.close();
+            } catch (SQLException ex) {
+
+            }
+        }
+
+        return -1;
     }
 
     public boolean deleteUser(int id) {

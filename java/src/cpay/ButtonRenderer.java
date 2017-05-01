@@ -28,7 +28,7 @@ public class ButtonRenderer extends JButton implements TableCellRenderer {
             setForeground(table.getForeground());
             setBackground(UIManager.getColor("Button.background"));
         }
-        setFont(new Font("Arial", Font.BOLD, 50));
+        setFont(new Font("Arial", Font.BOLD, 40));
         setText((value == null) ? "" : value.toString());
         return this;
     }

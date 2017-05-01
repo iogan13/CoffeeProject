@@ -5,6 +5,7 @@
  */
 package cpay;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -27,17 +28,19 @@ public class cpayMainFrame extends javax.swing.JFrame {
      * Creates new form cpayMainFrame
      */
     JTable users;
-    String dbPath = "F:\\Java\\cpayDB.sqlite";
+    String dbPath = "c:/NiHil/cpayDB.sqlite";
+    private user uInfo = null;
 
     public cpayMainFrame() {
 
         sqlDB dbCon = new sqlDB(dbPath);
-        
+
         initComponents();
         JScrollBar bar = userList.getVerticalScrollBar();
-        bar.setPreferredSize(new Dimension(100, 0));
+        bar.setPreferredSize(new Dimension(50, 0));
         DefaultTableModel dm = new DefaultTableModel();
         String[] userNames = dbCon.getUser();
+        dbCon = null;
         dm.setDataVector(new Object[][]{userNames},
                 new Object[]{"Users"});
 
@@ -45,13 +48,14 @@ public class cpayMainFrame extends javax.swing.JFrame {
 
         users.getColumn("Users").setCellRenderer(new ButtonRenderer());
         users.getColumn("Users").setCellEditor(new ButtonEditor(new JCheckBox()));
-        users.setRowHeight(120);
+        users.setRowHeight(60);
         users.setTableHeader(null);
         //repaint();
         userList.setViewportView(users);
 
         mainPanel.add(userList);
         pack();
+        repaint();
     }
 
     public class ButtonEditor extends DefaultCellEditor {
@@ -92,10 +96,16 @@ public class cpayMainFrame extends javax.swing.JFrame {
         @Override
         public Object getCellEditorValue() {
             if (isPushed) {
+
+                sqlDB dbCon = new sqlDB(dbPath);
+                int userId = dbCon.getUserIdByName(button.getText());
+                uInfo = new user(dbCon.isAdmin(userId), dbCon.isGuest(userId), userId, dbCon.getCardID(userId), button.getText());
                 mainPanel.remove(userList);
                 mainPanel.add(userPanel);
-                usernameField.setText(button.getText());
+                usernameField.setText(uInfo.getName());
+                coffeeCount.setText("1");
                 pack();
+                repaint();
             }
             isPushed = false;
             return label;
@@ -151,7 +161,35 @@ public class cpayMainFrame extends javax.swing.JFrame {
         jLabel4 = new javax.swing.JLabel();
         pinButtonRemove = new javax.swing.JButton();
         adminPanel = new javax.swing.JPanel();
+        adminUserLabel = new javax.swing.JLabel();
+        nfcPanel = new javax.swing.JPanel();
+        nfcIdField = new javax.swing.JTextField();
+        addNfcCardButton = new javax.swing.JButton();
+        switchNfcCardButton = new javax.swing.JButton();
+        deleteNfcCardButton = new javax.swing.JButton();
+        deleteUserPanel = new javax.swing.JPanel();
+        deleteUserButton = new javax.swing.JButton();
+        clearHistoryPanel = new javax.swing.JPanel();
+        clearHistoyButton = new javax.swing.JButton();
+        adminCloseMenu = new javax.swing.JButton();
+        accBalPanel = new javax.swing.JPanel();
+        adminAccountBalanceField = new javax.swing.JTextField();
+        resetUserAccountBalanceButton = new javax.swing.JButton();
+        payPanel = new javax.swing.JPanel();
+        coffeCountLabel = new javax.swing.JLabel();
+        coffePayLabel1 = new javax.swing.JLabel();
+        coffeePayLabel2 = new javax.swing.JLabel();
+        oldBalanceField = new javax.swing.JTextField();
+        oldBalanceLabel = new javax.swing.JLabel();
+        newBalanceLabel = new javax.swing.JLabel();
+        newBalanceField = new javax.swing.JTextField();
+        payButton = new javax.swing.JButton();
+        cancelButton = new javax.swing.JButton();
         mainPanel = new javax.swing.JPanel();
+
+        userPanel.setMaximumSize(new java.awt.Dimension(481, 321));
+        userPanel.setMinimumSize(new java.awt.Dimension(480, 320));
+        userPanel.setPreferredSize(new java.awt.Dimension(480, 320));
 
         removeCoffee.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/509.png"))); // NOI18N
         removeCoffee.addActionListener(new java.awt.event.ActionListener() {
@@ -195,6 +233,11 @@ public class cpayMainFrame extends javax.swing.JFrame {
         coffeeCount.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         coffeeCount.setText("1");
         coffeeCount.setEnabled(false);
+        coffeeCount.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                coffeeCountActionPerformed(evt);
+            }
+        });
 
         coffeHeader.setFont(new java.awt.Font("Tahoma", 1, 24)); // NOI18N
         coffeHeader.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -208,8 +251,7 @@ public class cpayMainFrame extends javax.swing.JFrame {
             }
         });
 
-        settingsButton.setIcon(new javax.swing.ImageIcon("F:\\Java\\Prog\\newIcon\\082__setting_cog.png")); // NOI18N
-        settingsButton.setToolTipText("");
+        settingsButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/082__setting_cog.png"))); // NOI18N
         settingsButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 settingsButtonActionPerformed(evt);
@@ -221,66 +263,70 @@ public class cpayMainFrame extends javax.swing.JFrame {
         userPanelLayout.setHorizontalGroup(
             userPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(userPanelLayout.createSequentialGroup()
-                .addComponent(exit, javax.swing.GroupLayout.PREFERRED_SIZE, 54, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addGroup(userPanelLayout.createSequentialGroup()
+                .addGroup(userPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(userPanelLayout.createSequentialGroup()
+                        .addComponent(exit, javax.swing.GroupLayout.PREFERRED_SIZE, 54, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(userPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(userPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addComponent(usernameField)
+                        .addComponent(accountField, javax.swing.GroupLayout.DEFAULT_SIZE, 270, Short.MAX_VALUE))
+                    .addComponent(settingsButton, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE)))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, userPanelLayout.createSequentialGroup()
+                .addContainerGap(45, Short.MAX_VALUE)
                 .addGroup(userPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, userPanelLayout.createSequentialGroup()
-                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 137, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(userPanelLayout.createSequentialGroup()
-                        .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGap(25, 25, 25)))
-                .addGroup(userPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(userPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                        .addComponent(coffeHeader, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, userPanelLayout.createSequentialGroup()
-                            .addComponent(removeCoffee)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                            .addGroup(userPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                .addComponent(pay, javax.swing.GroupLayout.DEFAULT_SIZE, 91, Short.MAX_VALUE)
-                                .addComponent(coffeeCount))
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(addCoffee)))
-                    .addGroup(userPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                        .addComponent(settingsButton, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGroup(userPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(accountField, javax.swing.GroupLayout.DEFAULT_SIZE, 555, Short.MAX_VALUE)
-                            .addComponent(usernameField)))))
+                        .addComponent(removeCoffee)
+                        .addGap(18, 18, 18)
+                        .addComponent(coffeeCount, javax.swing.GroupLayout.PREFERRED_SIZE, 91, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(15, 15, 15)
+                        .addComponent(addCoffee)
+                        .addGap(18, 18, 18)
+                        .addComponent(pay, javax.swing.GroupLayout.PREFERRED_SIZE, 91, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(40, 40, 40))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, userPanelLayout.createSequentialGroup()
+                        .addComponent(coffeHeader, javax.swing.GroupLayout.PREFERRED_SIZE, 269, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(102, 102, 102))))
         );
         userPanelLayout.setVerticalGroup(
             userPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(userPanelLayout.createSequentialGroup()
                 .addGroup(userPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(exit, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(settingsButton, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                    .addComponent(settingsButton, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(exit, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(userPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(usernameField)
                     .addComponent(jLabel1))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(userPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(userPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 58, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(accountField, javax.swing.GroupLayout.PREFERRED_SIZE, 58, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(43, 43, 43)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(coffeHeader)
                 .addGap(18, 18, 18)
-                .addGroup(userPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(removeCoffee, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(coffeeCount)
-                    .addComponent(addCoffee))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(pay, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGroup(userPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(addCoffee)
+                    .addComponent(removeCoffee)
+                    .addComponent(coffeeCount, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(pay, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(18, Short.MAX_VALUE))
         );
 
-        userList.setPreferredSize(new java.awt.Dimension(4, 4));
+        userList.setMaximumSize(new java.awt.Dimension(480, 320));
+        userList.setMinimumSize(new java.awt.Dimension(480, 320));
+        userList.setPreferredSize(new java.awt.Dimension(480, 320));
 
-        pinPanel.setMinimumSize(new java.awt.Dimension(786, 402));
-        pinPanel.setPreferredSize(new java.awt.Dimension(786, 402));
+        pinPanel.setMaximumSize(new java.awt.Dimension(480, 320));
+        pinPanel.setMinimumSize(new java.awt.Dimension(480, 320));
+        pinPanel.setPreferredSize(new java.awt.Dimension(480, 320));
 
         pinPassfield.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
         pinPassfield.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        pinPassfield.setEnabled(false);
 
         pinButton5.setFont(new java.awt.Font("Tahoma", 1, 24)); // NOI18N
         pinButton5.setText("5");
@@ -363,6 +409,7 @@ public class cpayMainFrame extends javax.swing.JFrame {
             }
         });
 
+        pinButtonOK.setBackground(new java.awt.Color(255, 0, 0));
         pinButtonOK.setFont(new java.awt.Font("Tahoma", 1, 24)); // NOI18N
         pinButtonOK.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/100__key.png"))); // NOI18N
         pinButtonOK.addActionListener(new java.awt.event.ActionListener() {
@@ -388,9 +435,10 @@ public class cpayMainFrame extends javax.swing.JFrame {
         pinPanelLayout.setHorizontalGroup(
             pinPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pinPanelLayout.createSequentialGroup()
+                .addGap(77, 77, 77)
                 .addGroup(pinPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(pinPanelLayout.createSequentialGroup()
-                        .addGap(285, 285, 285)
+                        .addGap(58, 58, 58)
                         .addGroup(pinPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pinPanelLayout.createSequentialGroup()
                                 .addComponent(pinButton7, javax.swing.GroupLayout.PREFERRED_SIZE, 49, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -407,30 +455,26 @@ public class cpayMainFrame extends javax.swing.JFrame {
                             .addComponent(pinButton0, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 49, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(pinPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(pinButton6, javax.swing.GroupLayout.DEFAULT_SIZE, 49, Short.MAX_VALUE)
-                            .addComponent(pinButton9, javax.swing.GroupLayout.DEFAULT_SIZE, 49, Short.MAX_VALUE)
-                            .addComponent(pinButton3, javax.swing.GroupLayout.DEFAULT_SIZE, 49, Short.MAX_VALUE)
-                            .addComponent(pinButtonRemove, javax.swing.GroupLayout.PREFERRED_SIZE, 1, Short.MAX_VALUE)))
+                            .addComponent(pinButton6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(pinButton9, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(pinButton3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(pinButtonRemove, javax.swing.GroupLayout.PREFERRED_SIZE, 49, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 275, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(pinPanelLayout.createSequentialGroup()
-                        .addGap(227, 227, 227)
-                        .addGroup(pinPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 275, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(pinPanelLayout.createSequentialGroup()
-                                .addComponent(pinPassfield, javax.swing.GroupLayout.PREFERRED_SIZE, 275, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(pinButtonOK, javax.swing.GroupLayout.PREFERRED_SIZE, 49, javax.swing.GroupLayout.PREFERRED_SIZE)))))
-                .addContainerGap(229, Short.MAX_VALUE))
+                        .addComponent(pinPassfield, javax.swing.GroupLayout.PREFERRED_SIZE, 275, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(pinButtonOK, javax.swing.GroupLayout.PREFERRED_SIZE, 49, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(73, Short.MAX_VALUE))
         );
         pinPanelLayout.setVerticalGroup(
             pinPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pinPanelLayout.createSequentialGroup()
-                .addGap(34, 34, 34)
                 .addComponent(jLabel4)
-                .addGap(18, 18, 18)
-                .addGroup(pinPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(pinPassfield, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(pinButtonOK, javax.swing.GroupLayout.PREFERRED_SIZE, 49, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(pinPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(pinButtonOK, javax.swing.GroupLayout.PREFERRED_SIZE, 49, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(pinPassfield, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(pinPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(pinButton9, javax.swing.GroupLayout.PREFERRED_SIZE, 49, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(pinButton8, javax.swing.GroupLayout.PREFERRED_SIZE, 49, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -449,23 +493,274 @@ public class cpayMainFrame extends javax.swing.JFrame {
                 .addGroup(pinPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(pinButton0, javax.swing.GroupLayout.PREFERRED_SIZE, 49, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(pinButtonRemove, javax.swing.GroupLayout.PREFERRED_SIZE, 49, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(46, Short.MAX_VALUE))
+                .addGap(0, 0, Short.MAX_VALUE))
         );
 
-        adminPanel.setMinimumSize(new java.awt.Dimension(786, 402));
+        adminPanel.setMaximumSize(new java.awt.Dimension(480, 320));
+        adminPanel.setMinimumSize(new java.awt.Dimension(480, 320));
+        adminPanel.setPreferredSize(new java.awt.Dimension(480, 320));
+
+        adminUserLabel.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        adminUserLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/103__user.png"))); // NOI18N
+        adminUserLabel.setText("Chilse");
+
+        nfcPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("NFC Card"));
+
+        nfcIdField.setFont(new java.awt.Font("Tahoma", 1, 20)); // NOI18N
+        nfcIdField.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        nfcIdField.setText("ID:24");
+        nfcIdField.setToolTipText("");
+        nfcIdField.setEnabled(false);
+
+        addNfcCardButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/005__plus.png"))); // NOI18N
+        addNfcCardButton.setText("Add");
+
+        switchNfcCardButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/019__refresh.png"))); // NOI18N
+        switchNfcCardButton.setText("Switch");
+
+        deleteNfcCardButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/086__empty.png"))); // NOI18N
+        deleteNfcCardButton.setText("Delete");
+
+        javax.swing.GroupLayout nfcPanelLayout = new javax.swing.GroupLayout(nfcPanel);
+        nfcPanel.setLayout(nfcPanelLayout);
+        nfcPanelLayout.setHorizontalGroup(
+            nfcPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(nfcPanelLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(nfcPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(addNfcCardButton)
+                    .addComponent(nfcIdField))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(nfcPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(switchNfcCardButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(deleteNfcCardButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
+        );
+        nfcPanelLayout.setVerticalGroup(
+            nfcPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(nfcPanelLayout.createSequentialGroup()
+                .addGroup(nfcPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(switchNfcCardButton, javax.swing.GroupLayout.PREFERRED_SIZE, 52, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(nfcIdField))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(nfcPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(addNfcCardButton, javax.swing.GroupLayout.PREFERRED_SIZE, 52, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(deleteNfcCardButton, javax.swing.GroupLayout.PREFERRED_SIZE, 52, javax.swing.GroupLayout.PREFERRED_SIZE)))
+        );
+
+        deleteUserPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Delete User"));
+
+        deleteUserButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/086__empty.png"))); // NOI18N
+
+        javax.swing.GroupLayout deleteUserPanelLayout = new javax.swing.GroupLayout(deleteUserPanel);
+        deleteUserPanel.setLayout(deleteUserPanelLayout);
+        deleteUserPanelLayout.setHorizontalGroup(
+            deleteUserPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(deleteUserButton, javax.swing.GroupLayout.DEFAULT_SIZE, 142, Short.MAX_VALUE)
+        );
+        deleteUserPanelLayout.setVerticalGroup(
+            deleteUserPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(deleteUserPanelLayout.createSequentialGroup()
+                .addComponent(deleteUserButton, javax.swing.GroupLayout.PREFERRED_SIZE, 68, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
+        );
+
+        clearHistoryPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Clear History"));
+
+        clearHistoyButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/086__empty.png"))); // NOI18N
+        clearHistoyButton.setToolTipText("");
+        clearHistoyButton.setMaximumSize(new java.awt.Dimension(147, 89));
+        clearHistoyButton.setMinimumSize(new java.awt.Dimension(147, 89));
+        clearHistoyButton.setPreferredSize(new java.awt.Dimension(147, 89));
+
+        javax.swing.GroupLayout clearHistoryPanelLayout = new javax.swing.GroupLayout(clearHistoryPanel);
+        clearHistoryPanel.setLayout(clearHistoryPanelLayout);
+        clearHistoryPanelLayout.setHorizontalGroup(
+            clearHistoryPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(clearHistoyButton, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+        );
+        clearHistoryPanelLayout.setVerticalGroup(
+            clearHistoryPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(clearHistoyButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+
+        adminCloseMenu.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/007__close.png"))); // NOI18N
+        adminCloseMenu.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                adminCloseMenuActionPerformed(evt);
+            }
+        });
+
+        accBalPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Account balance"));
+
+        adminAccountBalanceField.setFont(new java.awt.Font("Tahoma", 1, 20)); // NOI18N
+        adminAccountBalanceField.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        adminAccountBalanceField.setText("24,00 €");
+        adminAccountBalanceField.setToolTipText("");
+        adminAccountBalanceField.setEnabled(false);
+
+        resetUserAccountBalanceButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/126__cash.png"))); // NOI18N
+        resetUserAccountBalanceButton.setText("pay");
+        resetUserAccountBalanceButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                resetUserAccountBalanceButtonActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout accBalPanelLayout = new javax.swing.GroupLayout(accBalPanel);
+        accBalPanel.setLayout(accBalPanelLayout);
+        accBalPanelLayout.setHorizontalGroup(
+            accBalPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(accBalPanelLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(adminAccountBalanceField, javax.swing.GroupLayout.PREFERRED_SIZE, 124, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(resetUserAccountBalanceButton, javax.swing.GroupLayout.PREFERRED_SIZE, 143, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(13, Short.MAX_VALUE))
+        );
+        accBalPanelLayout.setVerticalGroup(
+            accBalPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, accBalPanelLayout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(accBalPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(adminAccountBalanceField, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(resetUserAccountBalanceButton, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap())
+        );
 
         javax.swing.GroupLayout adminPanelLayout = new javax.swing.GroupLayout(adminPanel);
         adminPanel.setLayout(adminPanelLayout);
         adminPanelLayout.setHorizontalGroup(
             adminPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 786, Short.MAX_VALUE)
+            .addGroup(adminPanelLayout.createSequentialGroup()
+                .addComponent(adminUserLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 214, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(adminCloseMenu, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE))
+            .addGroup(adminPanelLayout.createSequentialGroup()
+                .addGroup(adminPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(accBalPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(nfcPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(adminPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(clearHistoryPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(deleteUserPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
         );
         adminPanelLayout.setVerticalGroup(
             adminPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 402, Short.MAX_VALUE)
+            .addGroup(adminPanelLayout.createSequentialGroup()
+                .addGroup(adminPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(adminPanelLayout.createSequentialGroup()
+                        .addComponent(adminCloseMenu, javax.swing.GroupLayout.PREFERRED_SIZE, 58, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, adminPanelLayout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(adminUserLabel)
+                        .addGap(10, 10, 10)))
+                .addGroup(adminPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(deleteUserPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(accBalPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(adminPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(clearHistoryPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(nfcPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(2, 2, 2))
+        );
+
+        payPanel.setMaximumSize(new java.awt.Dimension(480, 320));
+        payPanel.setMinimumSize(new java.awt.Dimension(480, 320));
+        payPanel.setPreferredSize(new java.awt.Dimension(480, 320));
+
+        coffeCountLabel.setFont(new java.awt.Font("Tahoma", 1, 24)); // NOI18N
+        coffeCountLabel.setText("4");
+
+        coffePayLabel1.setFont(new java.awt.Font("Tahoma", 1, 24)); // NOI18N
+        coffePayLabel1.setText("You want to pay");
+
+        coffeePayLabel2.setFont(new java.awt.Font("Tahoma", 1, 24)); // NOI18N
+        coffeePayLabel2.setText("coffee");
+
+        oldBalanceField.setFont(new java.awt.Font("Tahoma", 1, 24)); // NOI18N
+        oldBalanceField.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        oldBalanceField.setText("12.00");
+        oldBalanceField.setEnabled(false);
+
+        oldBalanceLabel.setFont(new java.awt.Font("Tahoma", 1, 24)); // NOI18N
+        oldBalanceLabel.setText("old balance");
+
+        newBalanceLabel.setFont(new java.awt.Font("Tahoma", 1, 24)); // NOI18N
+        newBalanceLabel.setText("new balance");
+
+        newBalanceField.setFont(new java.awt.Font("Tahoma", 1, 24)); // NOI18N
+        newBalanceField.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        newBalanceField.setText("12.25");
+        newBalanceField.setEnabled(false);
+
+        payButton.setFont(new java.awt.Font("Tahoma", 1, 24)); // NOI18N
+        payButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/121__euro.png"))); // NOI18N
+        payButton.setToolTipText("");
+
+        cancelButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/007__close.png"))); // NOI18N
+        cancelButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cancelButtonActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout payPanelLayout = new javax.swing.GroupLayout(payPanel);
+        payPanel.setLayout(payPanelLayout);
+        payPanelLayout.setHorizontalGroup(
+            payPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(payPanelLayout.createSequentialGroup()
+                .addGap(48, 48, 48)
+                .addGroup(payPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(payPanelLayout.createSequentialGroup()
+                        .addGroup(payPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(oldBalanceLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(oldBalanceField)
+                            .addComponent(payButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGap(74, 74, 74)
+                        .addGroup(payPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(newBalanceLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(newBalanceField)
+                            .addComponent(cancelButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                    .addGroup(payPanelLayout.createSequentialGroup()
+                        .addGap(24, 24, 24)
+                        .addComponent(coffePayLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 203, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(coffeCountLabel)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(coffeePayLabel2)))
+                .addContainerGap(73, Short.MAX_VALUE))
+        );
+        payPanelLayout.setVerticalGroup(
+            payPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(payPanelLayout.createSequentialGroup()
+                .addGap(28, 28, 28)
+                .addGroup(payPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(coffeCountLabel)
+                    .addComponent(coffePayLabel1)
+                    .addComponent(coffeePayLabel2))
+                .addGap(47, 47, 47)
+                .addGroup(payPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(payPanelLayout.createSequentialGroup()
+                        .addComponent(oldBalanceLabel)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(oldBalanceField, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(payPanelLayout.createSequentialGroup()
+                        .addComponent(newBalanceLabel)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(newBalanceField, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(payPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(cancelButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(payButton))
+                .addGap(53, 53, 53))
         );
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setMaximumSize(new java.awt.Dimension(500, 365));
+        setMinimumSize(new java.awt.Dimension(480, 320));
+        setPreferredSize(new java.awt.Dimension(500, 365));
 
         mainPanel.setLayout(new java.awt.BorderLayout());
 
@@ -473,11 +768,11 @@ public class cpayMainFrame extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(mainPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 615, Short.MAX_VALUE)
+            .addComponent(mainPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 500, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(mainPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 465, Short.MAX_VALUE)
+            .addComponent(mainPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 350, Short.MAX_VALUE)
         );
 
         pack();
@@ -502,6 +797,7 @@ public class cpayMainFrame extends javax.swing.JFrame {
         mainPanel.remove(userPanel);
         mainPanel.add(userList);
         pack();
+        repaint();
     }//GEN-LAST:event_exitActionPerformed
 
     private void accountFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_accountFieldActionPerformed
@@ -513,56 +809,110 @@ public class cpayMainFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_payActionPerformed
 
     private void settingsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_settingsButtonActionPerformed
-        // TODO add your handling code here:
+        mainPanel.remove(userPanel);
+        mainPanel.add(pinPanel);
+        pack();
+        repaint();
     }//GEN-LAST:event_settingsButtonActionPerformed
 
     private void pinButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pinButton5ActionPerformed
-        // TODO add your handling code here:
+        pinPassfield.setText(new String(pinPassfield.getPassword()) + "5");
+        checkPW();
     }//GEN-LAST:event_pinButton5ActionPerformed
 
     private void pinButton8ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pinButton8ActionPerformed
-        // TODO add your handling code here:
+        pinPassfield.setText(new String(pinPassfield.getPassword()) + "8");
+        checkPW();
     }//GEN-LAST:event_pinButton8ActionPerformed
 
     private void pinButton7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pinButton7ActionPerformed
-        // TODO add your handling code here:
+        pinPassfield.setText(new String(pinPassfield.getPassword()) + "7");
+        checkPW();
     }//GEN-LAST:event_pinButton7ActionPerformed
 
     private void pinButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pinButton3ActionPerformed
-        // TODO add your handling code here:
+        pinPassfield.setText(new String(pinPassfield.getPassword()) + "3");
+        checkPW();
     }//GEN-LAST:event_pinButton3ActionPerformed
 
     private void pinButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pinButton4ActionPerformed
-        // TODO add your handling code here:
+        pinPassfield.setText(new String(pinPassfield.getPassword()) + "4");
+        checkPW();
     }//GEN-LAST:event_pinButton4ActionPerformed
 
     private void pinButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pinButton6ActionPerformed
-        // TODO add your handling code here:
+        pinPassfield.setText(new String(pinPassfield.getPassword()) + "6");
+        checkPW();
     }//GEN-LAST:event_pinButton6ActionPerformed
 
     private void pinButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pinButton2ActionPerformed
-        // TODO add your handling code here:
+        pinPassfield.setText(new String(pinPassfield.getPassword()) + "2");
+        checkPW();
     }//GEN-LAST:event_pinButton2ActionPerformed
 
     private void pinButton0ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pinButton0ActionPerformed
-        // TODO add your handling code here:
+        pinPassfield.setText(new String(pinPassfield.getPassword()) + "0");
+        checkPW();
     }//GEN-LAST:event_pinButton0ActionPerformed
 
     private void pinButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pinButton1ActionPerformed
-        // TODO add your handling code here:
+        pinPassfield.setText(new String(pinPassfield.getPassword()) + "1");
+        checkPW();
     }//GEN-LAST:event_pinButton1ActionPerformed
 
     private void pinButton9ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pinButton9ActionPerformed
-        // TODO add your handling code here:
+        pinPassfield.setText(new String(pinPassfield.getPassword()) + "9");
+        checkPW();
     }//GEN-LAST:event_pinButton9ActionPerformed
 
     private void pinButtonOKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pinButtonOKActionPerformed
-        // TODO add your handling code here:
+        if (new String(pinPassfield.getPassword()).equals("1337")) {
+            mainPanel.remove(pinPanel);
+            mainPanel.add(adminPanel);
+            pinPassfield.setText("");
+
+            adminUserLabel.setText(uInfo.getName());
+            nfcIdField.setText("ID:" + uInfo.getCardID());
+
+            System.out.println(uInfo.isAdmin());
+
+            pack();
+            repaint();
+        }
     }//GEN-LAST:event_pinButtonOKActionPerformed
 
     private void pinButtonRemoveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pinButtonRemoveActionPerformed
-        // TODO add your handling code here:
+        pinPassfield.setText(new String(pinPassfield.getPassword()).substring(0, new String(pinPassfield.getPassword()).length() - 1));
+        checkPW();
     }//GEN-LAST:event_pinButtonRemoveActionPerformed
+
+    private void adminCloseMenuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_adminCloseMenuActionPerformed
+        mainPanel.remove(adminPanel);
+        mainPanel.add(userList);
+        pinPassfield.setText("");
+        pack();
+        repaint();
+    }//GEN-LAST:event_adminCloseMenuActionPerformed
+
+    private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_cancelButtonActionPerformed
+
+    private void coffeeCountActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_coffeeCountActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_coffeeCountActionPerformed
+
+    private void resetUserAccountBalanceButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resetUserAccountBalanceButtonActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_resetUserAccountBalanceButtonActionPerformed
+
+    public void checkPW() {
+        if (pinPassfield.getPassword().length > 3) {
+            pinButtonOK.setBackground(Color.green);
+        } else {
+            pinButtonOK.setBackground(Color.red);
+        }
+    }
 
     /**
      * @param args the command line arguments
@@ -601,17 +951,39 @@ public class cpayMainFrame extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JPanel accBalPanel;
     private javax.swing.JTextField accountField;
     private javax.swing.JButton addCoffee;
+    private javax.swing.JButton addNfcCardButton;
+    private javax.swing.JTextField adminAccountBalanceField;
+    private javax.swing.JButton adminCloseMenu;
     private javax.swing.JPanel adminPanel;
+    private javax.swing.JLabel adminUserLabel;
+    private javax.swing.JButton cancelButton;
+    private javax.swing.JPanel clearHistoryPanel;
+    private javax.swing.JButton clearHistoyButton;
+    private javax.swing.JLabel coffeCountLabel;
     private javax.swing.JLabel coffeHeader;
+    private javax.swing.JLabel coffePayLabel1;
     private javax.swing.JTextField coffeeCount;
+    private javax.swing.JLabel coffeePayLabel2;
+    private javax.swing.JButton deleteNfcCardButton;
+    private javax.swing.JButton deleteUserButton;
+    private javax.swing.JPanel deleteUserPanel;
     private javax.swing.JButton exit;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JPanel mainPanel;
+    private javax.swing.JTextField newBalanceField;
+    private javax.swing.JLabel newBalanceLabel;
+    private javax.swing.JTextField nfcIdField;
+    private javax.swing.JPanel nfcPanel;
+    private javax.swing.JTextField oldBalanceField;
+    private javax.swing.JLabel oldBalanceLabel;
     private javax.swing.JButton pay;
+    private javax.swing.JButton payButton;
+    private javax.swing.JPanel payPanel;
     private javax.swing.JButton pinButton0;
     private javax.swing.JButton pinButton1;
     private javax.swing.JButton pinButton2;
@@ -627,7 +999,9 @@ public class cpayMainFrame extends javax.swing.JFrame {
     private javax.swing.JPanel pinPanel;
     private javax.swing.JPasswordField pinPassfield;
     private javax.swing.JButton removeCoffee;
+    private javax.swing.JButton resetUserAccountBalanceButton;
     private javax.swing.JButton settingsButton;
+    private javax.swing.JButton switchNfcCardButton;
     private javax.swing.JScrollPane userList;
     private javax.swing.JPanel userPanel;
     private javax.swing.JTextField usernameField;
